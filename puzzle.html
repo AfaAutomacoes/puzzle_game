@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quebra-cabeça</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .puzzle-container {
+            display: flex;
+            flex-wrap: wrap;
+            width: 400px;
+            height: 400px;
+            border: 2px solid #000;
+        }
+        .puzzle-piece {
+            width: 100px;
+            height: 100px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="puzzle-container" id="puzzle-container"></div>
+    <script>
+        const imageSrc = 'Imagem1'; // Nome da imagem usada no PowerApps
+        const container = document.getElementById('puzzle-container');
+        const pieceSize = 100;
+        const puzzleSize = 400;
+        const pieces = [];
+
+        for (let i = 0; i < puzzleSize / pieceSize; i++) {
+            for (let j = 0; j < puzzleSize / pieceSize; j++) {
+                const piece = document.createElement('div');
+                piece.classList.add('puzzle-piece');
+                piece.style.backgroundImage = `url(${imageSrc})`;
+                piece.style.backgroundSize = `${puzzleSize}px ${puzzleSize}px`;
+                piece.style.backgroundPosition = `-${j * pieceSize}px -${i * pieceSize}px`;
+                piece.draggable = true;
+                piece.addEventListener('dragstart', dragStart);
+                piece.addEventListener('dragover', dragOver);
+                piece.addEventListener('drop', drop);
+                pieces.push(piece);
+            }
+        }
+
+        // Shuffle the pieces
+        shuffleArray(pieces);
+
+        pieces.forEach(piece => container.appendChild(piece));
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        let dragged;
+
+        function dragStart(event) {
+            dragged = event.target;
+            event.dataTransfer.setData('text/plain', null);
+        }
+
+        function dragOver(event) {
+            event.preventDefault();
+        }
+
+        function drop(event) {
+            event.preventDefault();
+            if (event.target.classList.contains('puzzle-piece')) {
+                const draggedIndex = pieces.indexOf(dragged);
+                const targetIndex = pieces.indexOf(event.target);
+                container.insertBefore(dragged, event.target);
+                pieces.splice(draggedIndex, 1);
+                pieces.splice(targetIndex, 0, dragged);
+            }
+        }
+    </script>
+</body>
+</html>
